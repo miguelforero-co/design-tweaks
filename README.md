@@ -80,10 +80,34 @@ Both exports contain **every parameter with exact values** — no rounding, no o
 
 ## Installation
 
+**Requirements:** [Claude Code](https://claude.ai/code) + Git + macOS
+
+### 1. Clone into your skills folder
+
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/miguelforero-co/design-tweaks.git ~/.claude/skills/design-tweaks
 ```
+
+### 2. Verify
+
+```bash
+ls ~/.claude/skills/design-tweaks/SKILL.md
+```
+
+Should print the path. If it does, the skill is ready.
+
+### 3. Use it
+
+Open any Claude Code session and type:
+
+```
+/design-tweaks
+```
+
+Claude will read your conversation, ask what it needs to know, and open the right playground in your browser.
+
+> **First run takes ~2 seconds longer** — Google Fonts loads Plus Jakarta Sans on the first open. After that it's cached.
 
 ---
 
