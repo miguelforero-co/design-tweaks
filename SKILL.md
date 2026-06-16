@@ -1,10 +1,11 @@
 ---
 name: design-tweaks
-version: 1.0.0
+version: 1.1.0
 description: |
-  Interactive design system token explorer. Opens a visual playground where
-  you can tweak colors, typography, spacing, border radius, shadows, motion,
-  opacity, blur, and grid tokens in real time — then export as JSON or a
+  Universal visual tweaker. Opens an interactive dashboard-style playground where
+  you can adjust any visual parameter in real time — design tokens, iconography,
+  animation curves, spacing, sound parameters, color palettes, or any set of
+  knobs that belongs to the current project — then export as JSON or a
   natural-language prompt to apply back to the codebase.
 license: MIT
 compatibility: claude-code
@@ -17,15 +18,25 @@ allowed-tools:
   - Glob
 ---
 
-# design tweaks — Design System Token Explorer
+# design tweaks — Universal Visual Tweaker
 
-A self-contained visual playground for tuning design tokens. No build step, no dependencies, runs entirely in the browser.
+A self-contained visual playground with a consistent dashboard shell: sidebar nav, controls panel, live preview. What goes inside changes based on what you're building. No build step, no dependencies.
+
+## Core idea
+
+The shell is always the same:
+- Left sidebar: category nav (icon + label, sentence case)
+- Center panel: controls for the selected category (sliders, pills, swatches, toggles)
+- Right panel: live preview of the thing being tweaked
+
+The content varies by project. Design tokens, icon styles, animation curves, sound envelopes, component options — anything with visual knobs belongs here.
 
 ## When this skill is invoked
 
 Use this skill when the user:
 - Runs `/design-tweaks`
-- Asks to "open design tweaks", "tweak tokens", "open the design system explorer"
+- Says "open design tweaks", "let's tweak this visually", "open the tweaker"
+- Is working on visual parameters that would benefit from live adjustment
 - Pastes back a JSON block or "Copy Prompt" output from the explorer (apply mode)
 
 ---
@@ -38,79 +49,74 @@ Open the HTML file in the user's default browser:
 open ~/.claude/skills/design-tweaks/dev/explorer.html
 ```
 
-Then tell the user:
-> Explorer is open. Adjust any token in the sidebar — color, type, spacing, radius, shadow, motion, opacity, blur, or grid. When you're happy, hit **Copy JSON** or **Copy Prompt** and paste it back here to apply to the codebase.
+The default explorer shows design system token categories. If you're working on something else (animation, iconography, etc.), say so and Claude will generate a custom explorer for that context.
 
-Do not do anything else. Wait for the user to paste back the exported config.
+Then tell the user:
+> Explorer is open. Adjust any parameter in the sidebar. When done, hit **Copy JSON** or **Copy prompt** and paste it back here.
+
+Wait for the user to paste back the exported config.
 
 ---
 
-## Mode 2 — Apply exported tokens to the codebase
+## Mode 2 — Apply exported config to the codebase
 
-Triggered when the user pastes a JSON block (from Copy JSON) or a natural-language block (from Copy Prompt).
+Triggered when the user pastes a JSON block or natural-language config from the explorer.
 
-### Step 1 — Parse the config
+### Step 1 — Parse
 
-**JSON format:**
-```json
-{
-  "color": { "background": "#e8e8e8", "surface": "#ffffff", "accent": "#18181b", ... },
-  "typography": { "fontBase": "15.5px", "scaleRatio": 1.25, "fontFamily": "system", ... },
-  "spacing": { "unit": "4px" },
-  "border": { "radius": "11px", "width": "1px", "style": "solid" },
-  "shadow": { "level": "sm", "opacity": 0.1 },
-  "motion": { "fast": "100ms", "base": "200ms", "slow": "350ms", "easing": "standard" },
-  "opacity": { "disabled": 0.38, "overlay": 0.6, "muted": 0.5 },
-  "effects": { "blurSm": "4px", "blurMd": "8px", "blurLg": "16px", "backdropBlur": "8px" },
-  "grid": { "columns": 12, "gutter": "24px", "margin": "32px" }
-}
-```
+Extract all key-value pairs. Preserve the exact format (don't convert units or rename keys).
 
-**Prompt format** — parse key-value pairs from the natural-language block.
+### Step 2 — Find where these values live
 
-### Step 2 — Locate design token files
+Search the project in this order:
+1. CSS custom properties — `grep -r "--" --include="*.css" -l`
+2. JS/TS theme objects — `grep -r "fontBase\|radiusBase\|colorAccent\|theme\s*=" --include="*.ts" --include="*.js" --include="*.tsx" -l`
+3. Tailwind config — `glob **/tailwind.config.*`
+4. Token JSON — `glob **/tokens.json **/design-tokens.json`
 
-Search the project for where tokens are currently defined. Check in this order:
+If nothing found, ask the user before writing anything.
 
-1. **CSS custom properties** — `grep -r "\-\-.*color\|--font\|--radius\|--spacing" --include="*.css" -l`
-2. **JS/TS theme objects** — `grep -r "fontBase\|radiusBase\|colorAccent\|designTokens\|theme\s*=" --include="*.ts" --include="*.js" --include="*.tsx" -l`
-3. **Tailwind config** — `glob **/tailwind.config.*`
-4. **Design token JSON** — `glob **/tokens.json **/design-tokens.json **/*.tokens.json`
+### Step 3 — Write values
 
-If no token files are found, ask the user where tokens are defined before writing anything.
-
-### Step 3 — Write the values
-
-Map the exported tokens to the project's naming convention and update the files. Preserve the project's existing format (CSS vars, JS object, JSON, etc.) — don't convert between formats.
-
-**CSS custom property mapping:**
-| Explorer key | CSS token name (typical) |
-|---|---|
-| color.background | `--color-bg`, `--background`, `--dt-bg` |
-| color.surface | `--color-surface`, `--surface` |
-| color.accent | `--color-accent`, `--accent`, `--primary` |
-| typography.fontBase | `--font-size-base`, `--text-base` |
-| typography.scaleRatio | (computed scale — update individual size steps) |
-| spacing.unit | `--space-unit`, `--spacing-base` |
-| border.radius | `--radius`, `--border-radius-base` |
-| shadow.level / opacity | (recompute shadow strings from level + opacity) |
-| motion.fast / base / slow | `--duration-fast`, `--duration-base`, `--duration-slow` |
-| motion.easing | `--ease`, `--easing-standard` |
-
-If the project has its own naming convention, match it — don't rename existing tokens.
+Match keys to the project's naming convention. Don't convert formats or rename tokens.
 
 ### Step 4 — Confirm
 
-After writing, list every file touched and every token updated. Do not open the explorer again unless the user asks.
+List every file touched and every value updated.
+
+---
+
+## Mode 3 — Generate a custom tweaker for a specific subject
+
+If the user is working on something other than design tokens (iconography, motion curves, sound, component options, etc.), generate a custom version of the explorer HTML in `~/.claude/skills/design-tweaks/dev/` with:
+- Same shell design (topbar, sidebar, controls, preview)
+- Categories and controls matched to the subject
+- Same Copy JSON / Copy Prompt export
+- Same dark mode toggle
+
+Examples of custom tweaker subjects:
+| Subject | Categories | Controls |
+|---|---|---|
+| Icon style | Stroke, Corner, Size, Optical sizing | Weight slider, corner radius, size grid |
+| Animation | Timing, Easing, Stagger, Spring | Duration sliders, bezier picker, spring mass/stiffness |
+| Sound design | Envelope, Tone, Reverb, Mix | ADSR sliders, frequency, waveform pills |
+| Component options | Density, Shape, Color role, Interaction | Compact/default/comfortable pills, radius, accent |
+
+**Shell invariants** — these never change regardless of subject:
+- Font: Plus Jakarta Sans (loaded from Google Fonts)
+- Background: `#e9e7e4` (warm gray)
+- Sidebar/controls/topbar: white `#fff`, border `#e5e3df`
+- Preview area bg: `#f2f0ed`
+- Labels: sentence case, 13px, 500 weight
+- No uppercase eyebrows, no gradient text, no glow effects
+- Monospace font only for values/numbers
 
 ---
 
 ## Modular type scale
 
-The explorer computes the full type scale from `fontBase` × `scaleRatio^step`. When applying to a project that uses a computed scale, update only the base and ratio. When the project hardcodes each step, compute and write all sizes:
-
 ```
-xs  = fontBase × ratio^-2
+xs  = fontBase × ratio^-3
 sm  = fontBase × ratio^-1
 base = fontBase
 lg  = fontBase × ratio^1
@@ -120,22 +126,20 @@ xl  = fontBase × ratio^2
 4xl = fontBase × ratio^5
 ```
 
-Round to 1 decimal place (e.g. `12.4px`).
+Round to 1 decimal (e.g. `12.4px`).
 
 ---
 
 ## Shadow string reconstruction
 
-The explorer stores `shadowLevel` and `shadowOpacity`. If the project stores full shadow strings, reconstruct them:
-
 ```
 none → none
-xs   → 0 1px 2px 0 rgba(0,0,0,{opacity})
-sm   → 0 1px 3px 0 rgba(0,0,0,{opacity}), 0 1px 2px -1px rgba(0,0,0,{opacity})
-md   → 0 4px 6px -1px rgba(0,0,0,{opacity}), 0 2px 4px -2px rgba(0,0,0,{opacity})
-lg   → 0 10px 15px -3px rgba(0,0,0,{opacity}), 0 4px 6px -4px rgba(0,0,0,{opacity})
-xl   → 0 20px 25px -5px rgba(0,0,0,{opacity}), 0 8px 10px -6px rgba(0,0,0,{opacity})
-2xl  → 0 25px 50px -12px rgba(0,0,0,{opacity})
+xs   → 0 1px 2px rgba(0,0,0,{opacity})
+sm   → 0 1px 3px rgba(0,0,0,{o}), 0 1px 2px -1px rgba(0,0,0,{o})
+md   → 0 4px 6px -1px rgba(0,0,0,{o}), 0 2px 4px -2px rgba(0,0,0,{o})
+lg   → 0 10px 15px -3px rgba(0,0,0,{o}), 0 4px 6px -4px rgba(0,0,0,{o})
+xl   → 0 20px 25px -5px rgba(0,0,0,{o}), 0 8px 10px -6px rgba(0,0,0,{o})
+2xl  → 0 25px 50px -12px rgba(0,0,0,{o})
 ```
 
 ---
@@ -157,7 +161,8 @@ xl   → 0 20px 25px -5px rgba(0,0,0,{opacity}), 0 8px 10px -6px rgba(0,0,0,{opa
 ## Rules
 
 - Never open the explorer more than once per invocation unless asked.
-- Never guess where tokens live — search first, confirm before writing if ambiguous.
-- Never convert the project's token format (CSS → JS, etc.) unless explicitly asked.
+- Never guess where tokens live — search first, confirm if ambiguous.
+- Never convert the project's token format (CSS → JS, etc.) unless asked.
 - Never apply dark-mode token values to light-mode variables or vice versa.
-- If the pasted config has `"mode": "dark"`, apply to dark-mode token overrides only.
+- If the pasted config has `"mode": "dark"`, apply to dark-mode overrides only.
+- When generating a custom tweaker, always use the same shell design — no exceptions.
