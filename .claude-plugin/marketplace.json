@@ -1,0 +1,33 @@
+{
+  "name": "design-tweaks",
+  "id": "design-tweaks",
+  "owner": {
+    "name": "miguelforero-co"
+  },
+  "metadata": {
+    "description": "Universal visual tweaker — design tokens, animation, iconography, sound, component options. Live dashboard playground with exact value export.",
+    "version": "1.3.0"
+  },
+  "plugins": [
+    {
+      "name": "design-tweaks",
+      "source": "./",
+      "description": "Universal visual tweaker. Reads your conversation, opens an interactive dashboard playground to adjust any visual parameter live, and exports exact values as JSON or a prompt to apply back to the codebase.",
+      "version": "1.3.0",
+      "author": {
+        "name": "miguelforero-co"
+      },
+      "keywords": [
+        "design",
+        "tokens",
+        "animation",
+        "tweaker",
+        "playground",
+        "ui",
+        "visual"
+      ],
+      "category": "design",
+      "strict": false
+    }
+  ]
+}
