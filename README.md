@@ -1,26 +1,23 @@
+<div align="center">
+
 # design tweaks
 
-A Claude Code skill that opens an interactive visual tweaker — a dashboard-style playground where you adjust parameters live, see them reflected in a preview instantly, and export exact values as JSON or a structured prompt to apply back to the codebase.
+**A Claude Code skill — universal visual tweaker**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-skill-black)](https://claude.ai/code)
+[![macOS](https://img.shields.io/badge/macOS-only-black)](https://claude.ai/code)
+[![Version](https://img.shields.io/badge/version-1.3.0-black)](SKILL.md)
 
 ![design tweaks explorer](preview.png)
 
+</div>
+
 ---
 
-## What it is
+Open an interactive dashboard-style playground, adjust any visual parameter live, and export exact values back to your codebase. Claude reads your conversation, understands what you're building, asks what it needs, then opens the right explorer — or generates one from scratch.
 
-Not a design token editor. Not a theme picker. A general-purpose visual tweaker for **any parameter that benefits from live adjustment**.
-
-Claude reads your conversation, understands what you're working on, asks what it needs to know, then opens the right playground — or generates one from scratch if the subject is something new.
-
-**Works for:**
-- Design tokens — colors, typography, spacing, border, shadow, motion, opacity, blur, grid
-- Animation — timing curves, spring physics, stagger, duration
-- Iconography — stroke weight, corner radius, optical sizing, color
-- Component options — density, shape, color roles, interaction states
-- Sound — envelope, tone, reverb, mix levels
-- Anything else with visual or numeric knobs
-
-The shell (layout, font, colors) is always the same. What's inside adapts.
+**Not just design tokens.** Animation timing, icon styles, sound envelopes, component options, color systems — anything with knobs.
 
 ---
 
@@ -30,20 +27,35 @@ The shell (layout, font, colors) is always the same. What's inside adapts.
 /design-tweaks
 ```
 
-1. Claude reads what you've been building in the conversation
-2. Asks clarifying questions until it knows exactly what to tweak
+1. Claude reads what you've been building
+2. Asks until it has full context
 3. Opens the right explorer in your browser
-4. You adjust — the preview updates live
-5. Hit **Copy JSON** or **Copy prompt** — paste back into Claude
-6. Claude writes the exact values to your project files
+4. Adjust — preview updates live
+5. **Copy JSON** or **Copy prompt** → paste back into Claude
+6. Claude writes the exact values to your files
 
 ---
 
-## Export format
+## What you can tweak
 
-Both exports contain **every parameter with exact values** — no rounding, no omissions.
+| Subject | Parameters |
+|---|---|
+| Design tokens | Color, typography, spacing, border, shadow, motion, opacity, blur, grid |
+| Animation | Timing curves, spring physics, stagger, durations |
+| Iconography | Stroke weight, corner radius, optical sizing, color |
+| Component options | Density, shape, color roles, interaction states |
+| Sound | Envelope (ADSR), tone, reverb, mix levels |
+| Anything else | Claude generates the right controls for the subject |
 
-**Copy JSON:**
+---
+
+## Export
+
+Both exports include **every parameter with exact values** — no rounding, no omissions.
+
+<details>
+<summary>Copy JSON example</summary>
+
 ```json
 {
   "mode": "light",
@@ -70,26 +82,31 @@ Both exports contain **every parameter with exact values** — no rounding, no o
   "spacing": { "unit": "4px" },
   "border": { "radius": "10px", "width": "1px", "style": "solid" },
   "shadow": { "level": "sm", "opacity": 0.1 },
-  "motion": { "fast": "100ms", "base": "200ms", "slow": "350ms", "easing": "standard" }
+  "motion": { "fast": "100ms", "base": "200ms", "slow": "350ms", "easing": "standard" },
+  "opacity": { "disabled": 0.38, "overlay": 0.6, "muted": 0.5 },
+  "effects": { "blurSm": "4px", "blurMd": "8px", "blurLg": "16px", "backdropBlur": "8px" },
+  "grid": { "columns": 12, "gutter": "24px", "margin": "32px" }
 }
 ```
 
-**Copy prompt** — same values, structured as a natural-language instruction to paste into any Claude conversation.
+</details>
+
+Paste the output back into Claude and it locates the token files in your project and writes the values directly.
 
 ---
 
 ## Installation
 
-**Requirements:** [Claude Code](https://claude.ai/code) + Git + macOS
+**Requirements:** [Claude Code](https://claude.ai/code) · Git · macOS
 
-### 1. Clone into your skills folder
+**1. Clone into your skills folder**
 
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/miguelforero-co/design-tweaks.git ~/.claude/skills/design-tweaks
 ```
 
-### 2. Verify
+**2. Verify**
 
 ```bash
 ls ~/.claude/skills/design-tweaks/SKILL.md
@@ -97,45 +114,24 @@ ls ~/.claude/skills/design-tweaks/SKILL.md
 
 Should print the path. If it does, the skill is ready.
 
-### 3. Use it
+**3. Use it**
 
-Open any Claude Code session and type:
+Open any Claude Code session and type `/design-tweaks`.
 
-```
-/design-tweaks
-```
-
-Claude will read your conversation, ask what it needs to know, and open the right playground in your browser.
-
-> **First run takes ~2 seconds longer** — Google Fonts loads Plus Jakarta Sans on the first open. After that it's cached.
+> First run takes ~2 seconds longer — Google Fonts loads on first open, then caches.
 
 ---
 
 ## Updating
 
-Pull the latest version at any time:
-
 ```bash
 cd ~/.claude/skills/design-tweaks && git pull
 ```
 
-**What gets updated:** `explorer.html` (the default token tweaker) and `SKILL.md` (the skill instructions).
-
-**What stays untouched:** Any custom tweakers Claude generated for your specific projects live only on your machine (they're in `dev/` but gitignored). A `git pull` never touches them.
-
-**If you modified skill files manually:** That's a merge conflict — don't edit skill files directly. Claude uses them as-is.
-
----
-
-## Requirements
-
-- Claude Code
-- macOS (uses `open` to launch the browser)
-- Internet access on first load (Google Fonts — Plus Jakarta Sans)
-- No build step, no dependencies — pure HTML/CSS/JS
+Updates `explorer.html` and `SKILL.md`. Custom tweakers Claude generated for your projects live only on your machine (`dev/` is gitignored) — a pull never touches them.
 
 ---
 
 ## License
 
-MIT — Miguel Forero, 2026
+MIT — [Miguel Forero](https://miguelforero.co), 2026
