@@ -134,4 +134,4 @@ Updates `explorer.html` and `SKILL.md`. Custom tweakers Claude generated for you
 
 ## License
 
-MIT — [Miguel Forero](https://miguelforero.co), 2026
+MIT — Miguel Forero, 2026 — see [LICENSE](LICENSE)
