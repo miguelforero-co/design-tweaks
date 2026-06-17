@@ -97,22 +97,23 @@ Paste the output back into Claude and it locates the token files in your project
 
 ## Installation
 
-**Requirements:** [Claude Code](https://claude.ai/code) · Git · macOS
+**Requirements:** [Claude Code](https://claude.ai/code) · macOS
 
-**1. Clone into your skills folder**
+**One command:**
+
+```
+/plugin marketplace add miguelforero-co/design-tweaks
+```
+
+Run it inside any Claude Code session. Done.
+
+**Or manually with Git:**
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone https://github.com/miguelforero-co/design-tweaks.git ~/.claude/skills/design-tweaks
+git clone https://github.com/miguelforero-co/design-tweaks.git /tmp/design-tweaks
+cp -r /tmp/design-tweaks/.claude/skills/design-tweaks ~/.claude/skills/design-tweaks
 ```
-
-**2. Verify**
-
-```bash
-ls ~/.claude/skills/design-tweaks/SKILL.md
-```
-
-Should print the path. If it does, the skill is ready.
 
 **3. Use it**
 
@@ -124,11 +125,19 @@ Open any Claude Code session and type `/design-tweaks`.
 
 ## Updating
 
+**Via plugin:**
+
+```
+/plugin marketplace update miguelforero-co/design-tweaks
+```
+
+**Via Git (manual install):**
+
 ```bash
 cd ~/.claude/skills/design-tweaks && git pull
 ```
 
-Updates `explorer.html` and `SKILL.md`. Custom tweakers Claude generated for your projects live only on your machine (`dev/` is gitignored) — a pull never touches them.
+Updates `explorer.html` and `SKILL.md`. Custom tweakers Claude generated for your projects live only on your machine (`dev/` is gitignored) — an update never touches them.
 
 ---
 

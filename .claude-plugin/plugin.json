@@ -1,0 +1,11 @@
+{
+  "name": "design-tweaks",
+  "description": "Universal visual tweaker. Reads your conversation, asks what it needs, opens an interactive dashboard playground to adjust any visual parameter live — design tokens, animation, iconography, sound, component options — then exports exact values as JSON or a structured prompt to apply back to the codebase.",
+  "version": "1.3.0",
+  "author": {
+    "name": "Miguel Forero"
+  },
+  "license": "MIT",
+  "keywords": ["design", "tokens", "animation", "tweaker", "playground", "ui", "visual"],
+  "skills": ["./.claude/skills/design-tweaks"]
+}
